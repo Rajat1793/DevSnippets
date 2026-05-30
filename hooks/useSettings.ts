@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { AppSettings } from '@/types';
 
-const SETTINGS_KEY = '@devsnippets:settings';
+const SETTINGS_KEY = 'devsnippets_settings';
 
 const DEFAULT_SETTINGS: AppSettings = {
   theme: 'system',
@@ -18,7 +18,7 @@ export function useSettings() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    AsyncStorage.getItem(SETTINGS_KEY).then((stored) => {
+    SecureStore.getItemAsync(SETTINGS_KEY).then((stored) => {
       if (stored) {
         try {
           const parsed = JSON.parse(stored) as Partial<AppSettings>;
@@ -34,12 +34,12 @@ export function useSettings() {
   const updateSettings = useCallback(async (updates: Partial<AppSettings>) => {
     const next = { ...settings, ...updates };
     setSettings(next);
-    await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
+    await SecureStore.setItemAsync(SETTINGS_KEY, JSON.stringify(next));
   }, [settings]);
 
   const resetSettings = useCallback(async () => {
     setSettings(DEFAULT_SETTINGS);
-    await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS));
+    await SecureStore.setItemAsync(SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS));
   }, []);
 
   return { settings, loading, updateSettings, resetSettings };

@@ -5,6 +5,7 @@ A modern, offline-first developer utility mobile application built with Expo SDK
 ## 🚀 Features
 
 ### Core Functionality
+
 - **Snippet Management** — Create, edit, delete, search, and favorite code snippets
 - **Offline-First** — All data stored locally; works without internet
 - **File Manager** — Browse, import, copy, move, and delete files
@@ -34,12 +35,12 @@ Indexes: `idx_snippets_language`, `idx_snippets_is_favorite`, `idx_snippets_crea
 
 ## 📦 Offline Storage Approach
 
-| Technology | Usage |
-|---|---|
-| **AsyncStorage** | Theme preference (`light/dark/system`), font size, line numbers toggle, AI provider/model config |
-| **SecureStore** | AI API key (encrypted at rest, never stored in plain text) |
-| **SQLite** | All snippet data — full CRUD with search, filtering by language and favorites |
-| **Expo FileSystem** | Local file management, exported snippets, attached screenshots, templates |
+| Technology          | Usage                                                                                            |
+| ------------------- | ------------------------------------------------------------------------------------------------ |
+| **AsyncStorage**    | Theme preference (`light/dark/system`), font size, line numbers toggle, AI provider/model config |
+| **SecureStore**     | AI API key (encrypted at rest, never stored in plain text)                                       |
+| **SQLite**          | All snippet data — full CRUD with search, filtering by language and favorites                    |
+| **Expo FileSystem** | Local file management, exported snippets, attached screenshots, templates                        |
 
 All operations function completely offline. No network calls are made for core functionality — only the optional AI explanation feature requires internet access.
 
@@ -60,24 +61,6 @@ Documents/
 - **Delete** with `file.delete()` or `dir.delete()`
 - **Create folders** with `new Directory(parent, name).create()`
 - **Attach images** via `expo-image-picker` → copied to `attachments/`
-
-## 🤖 AI Integration Workflow
-
-1. User taps **"AI Explain"** on a snippet detail screen
-2. API key is retrieved from **SecureStore** (set in Settings)
-3. A structured prompt is sent to the configured AI provider:
-   - **OpenAI** (default, `gpt-4o-mini`) via `https://api.openai.com/v1/chat/completions`
-   - **Google Gemini** via `https://generativelanguage.googleapis.com/v1beta`
-   - **Custom OpenAI-compatible** endpoint (LM Studio, Ollama, etc.)
-4. The response is parsed as JSON:
-   ```json
-   {
-     "explanation": "...",
-     "summary": "...",
-     "improvements": ["...", "...", "..."]
-   }
-   ```
-5. Displayed in a bottom sheet modal with sections for Summary, Explanation, and Improvements
 
 ## 🏗️ Project Structure
 
@@ -143,19 +126,3 @@ npx expo start
 ```
 
 Then scan the QR code with Expo Go (iOS/Android) or press `i` for iOS simulator / `a` for Android emulator.
-
-## 📸 Screens
-
-1. **Home** — Snippet list with search, language filters, FAB to create
-2. **Favorites** — Starred snippets for quick access
-3. **File Manager** — Browse folders: My Files, Exports, Attachments, Templates
-4. **Settings** — Theme toggle, font size, AI provider config, API key management, bulk export
-5. **Create Snippet** — Title, language picker, description, tags, code editor
-6. **Snippet Detail** — Code viewer, AI explanation, export options, edit/delete
-
-## 🔐 API Key Setup
-
-1. Open **Settings** tab
-2. Select your AI provider (OpenAI, Gemini, or Custom)
-3. Enter your API key and tap **Save Key**
-4. Keys are stored using **SecureStore** (device-encrypted storage)

@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { useColorScheme } from 'react-native';
 import { Colors, ColorScheme } from '@/constants/Colors';
 import { Theme } from '@/types';
 
-const THEME_KEY = '@devsnippets:theme';
+const THEME_KEY = 'devsnippets_theme';
 
 interface ThemeContextValue {
   theme: Theme;
@@ -25,7 +25,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [themePreference, setThemePref] = useState<'light' | 'dark' | 'system'>('system');
 
   useEffect(() => {
-    AsyncStorage.getItem(THEME_KEY).then((stored) => {
+    SecureStore.getItemAsync(THEME_KEY).then((stored) => {
       if (stored === 'light' || stored === 'dark' || stored === 'system') {
         setThemePref(stored);
       }
@@ -39,7 +39,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const setThemePreference = async (pref: 'light' | 'dark' | 'system') => {
     setThemePref(pref);
-    await AsyncStorage.setItem(THEME_KEY, pref);
+    await SecureStore.setItemAsync(THEME_KEY, pref);
   };
 
   return (
