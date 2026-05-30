@@ -1,16 +1,16 @@
-import { useState, useEffect, useCallback } from 'react';
-import * as SecureStore from 'expo-secure-store';
-import { AppSettings } from '@/types';
+import { AppSettings } from "@/types";
+import * as SecureStore from "expo-secure-store";
+import { useCallback, useEffect, useState } from "react";
 
-const SETTINGS_KEY = 'devsnippets_settings';
+const SETTINGS_KEY = "devsnippets_settings";
 
 const DEFAULT_SETTINGS: AppSettings = {
-  theme: 'system',
+  theme: "system",
   fontSize: 14,
   showLineNumbers: true,
-  aiProvider: 'openai',
-  aiModel: 'gpt-4o-mini',
-  customAiEndpoint: '',
+  aiProvider: "openai",
+  aiModel: "gpt-4o-mini",
+  customAiEndpoint: "",
 };
 
 export function useSettings() {
@@ -31,15 +31,21 @@ export function useSettings() {
     });
   }, []);
 
-  const updateSettings = useCallback(async (updates: Partial<AppSettings>) => {
-    const next = { ...settings, ...updates };
-    setSettings(next);
-    await SecureStore.setItemAsync(SETTINGS_KEY, JSON.stringify(next));
-  }, [settings]);
+  const updateSettings = useCallback(
+    async (updates: Partial<AppSettings>) => {
+      const next = { ...settings, ...updates };
+      setSettings(next);
+      await SecureStore.setItemAsync(SETTINGS_KEY, JSON.stringify(next));
+    },
+    [settings],
+  );
 
   const resetSettings = useCallback(async () => {
     setSettings(DEFAULT_SETTINGS);
-    await SecureStore.setItemAsync(SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS));
+    await SecureStore.setItemAsync(
+      SETTINGS_KEY,
+      JSON.stringify(DEFAULT_SETTINGS),
+    );
   }, []);
 
   return { settings, loading, updateSettings, resetSettings };

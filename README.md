@@ -2,7 +2,16 @@
 
 A modern, offline-first developer utility mobile application built with Expo SDK 55, React Native, and TypeScript.
 
-## 🚀 Features
+## Screens
+
+<p align="center">
+  <img src="assets/images/screen1.jpg" width="22%" alt="Snippets list" />
+  <img src="assets/images/screen2.jpg" width="22%" alt="Snippet detail" />
+  <img src="assets/images/screen3.jpg" width="22%" alt="Edit snippet" />
+  <img src="assets/images/screen4.jpg" width="22%" alt="Settings" />
+</p>
+
+## Features
 
 ### Core Functionality
 
@@ -12,7 +21,7 @@ A modern, offline-first developer utility mobile application built with Expo SDK
 - **AI Explanations** — Get AI-powered explanations, summaries, and improvement suggestions
 - **Export & Share** — Export snippets as `.txt`, `.js`/`.py`/etc., or `.json`
 
-## 🗄️ Database Structure
+## Database Structure
 
 SQLite database (`devsnippets.db`) with one primary table:
 
@@ -33,7 +42,7 @@ CREATE TABLE snippets (
 
 Indexes: `idx_snippets_language`, `idx_snippets_is_favorite`, `idx_snippets_created_at`
 
-## 📦 Offline Storage Approach
+## Offline Storage Approach
 
 | Technology          | Usage                                                                                            |
 | ------------------- | ------------------------------------------------------------------------------------------------ |
@@ -44,7 +53,7 @@ Indexes: `idx_snippets_language`, `idx_snippets_is_favorite`, `idx_snippets_crea
 
 All operations function completely offline. No network calls are made for core functionality — only the optional AI explanation feature requires internet access.
 
-## 📁 File Management Implementation
+## File Management Implementation
 
 Using the new **Expo FileSystem v55** class-based API (`File`, `Directory`, `Paths`):
 
@@ -62,7 +71,7 @@ Documents/
 - **Create folders** with `new Directory(parent, name).create()`
 - **Attach images** via `expo-image-picker` → copied to `attachments/`
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 DevSnippets/
@@ -103,7 +112,7 @@ DevSnippets/
     └── index.ts                 # TypeScript interfaces
 ```
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Expo SDK 55**
 - **React Native 0.83.6**
@@ -118,7 +127,7 @@ DevSnippets/
 - **expo-clipboard** — Copy code to clipboard
 - **expo-router** — File-based navigation
 
-## ▶️ Running the App
+## Running the App
 
 ```bash
 npm install

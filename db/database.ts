@@ -1,5 +1,5 @@
-import * as SQLite from 'expo-sqlite';
-import { Snippet, SnippetRow, Language } from '@/types';
+import { Language, Snippet, SnippetRow } from "@/types";
+import * as SQLite from "expo-sqlite";
 
 let db: SQLite.SQLiteDatabase | null = null;
 let dbInitPromise: Promise<SQLite.SQLiteDatabase> | null = null;
@@ -8,7 +8,7 @@ export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
   if (db) return db;
   if (!dbInitPromise) {
     dbInitPromise = (async () => {
-      const database = await SQLite.openDatabaseAsync('devsnippets.db');
+      const database = await SQLite.openDatabaseAsync("devsnippets.db");
       await initializeDatabase(database);
       db = database;
       return database;
@@ -17,9 +17,11 @@ export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
   return dbInitPromise;
 }
 
-async function initializeDatabase(database: SQLite.SQLiteDatabase): Promise<void> {
-  await database.execAsync('PRAGMA journal_mode = WAL');
-  await database.execAsync('PRAGMA foreign_keys = ON');
+async function initializeDatabase(
+  database: SQLite.SQLiteDatabase,
+): Promise<void> {
+  await database.execAsync("PRAGMA journal_mode = WAL");
+  await database.execAsync("PRAGMA foreign_keys = ON");
   await database.execAsync(`
     CREATE TABLE IF NOT EXISTS snippets (
       id TEXT PRIMARY KEY NOT NULL,
@@ -34,9 +36,15 @@ async function initializeDatabase(database: SQLite.SQLiteDatabase): Promise<void
       updated_at TEXT NOT NULL
     )
   `);
-  await database.execAsync('CREATE INDEX IF NOT EXISTS idx_snippets_language ON snippets(language)');
-  await database.execAsync('CREATE INDEX IF NOT EXISTS idx_snippets_is_favorite ON snippets(is_favorite)');
-  await database.execAsync('CREATE INDEX IF NOT EXISTS idx_snippets_created_at ON snippets(created_at)');
+  await database.execAsync(
+    "CREATE INDEX IF NOT EXISTS idx_snippets_language ON snippets(language)",
+  );
+  await database.execAsync(
+    "CREATE INDEX IF NOT EXISTS idx_snippets_is_favorite ON snippets(is_favorite)",
+  );
+  await database.execAsync(
+    "CREATE INDEX IF NOT EXISTS idx_snippets_created_at ON snippets(created_at)",
+  );
 }
 
 function rowToSnippet(row: SnippetRow): Snippet {
@@ -63,7 +71,7 @@ function rowToSnippet(row: SnippetRow): Snippet {
 export async function getAllSnippets(): Promise<Snippet[]> {
   const database = await getDatabase();
   const rows = await database.getAllAsync<SnippetRow>(
-    'SELECT * FROM snippets ORDER BY updated_at DESC'
+    "SELECT * FROM snippets ORDER BY updated_at DESC",
   );
   return rows.map(rowToSnippet);
 }
@@ -71,8 +79,8 @@ export async function getAllSnippets(): Promise<Snippet[]> {
 export async function getSnippetById(id: string): Promise<Snippet | null> {
   const database = await getDatabase();
   const row = await database.getFirstAsync<SnippetRow>(
-    'SELECT * FROM snippets WHERE id = ?',
-    [id]
+    "SELECT * FROM snippets WHERE id = ?",
+    [id],
   );
   return row ? rowToSnippet(row) : null;
 }
@@ -80,7 +88,7 @@ export async function getSnippetById(id: string): Promise<Snippet | null> {
 export async function getFavoriteSnippets(): Promise<Snippet[]> {
   const database = await getDatabase();
   const rows = await database.getAllAsync<SnippetRow>(
-    'SELECT * FROM snippets WHERE is_favorite = 1 ORDER BY updated_at DESC'
+    "SELECT * FROM snippets WHERE is_favorite = 1 ORDER BY updated_at DESC",
   );
   return rows.map(rowToSnippet);
 }
@@ -92,21 +100,25 @@ export async function searchSnippets(query: string): Promise<Snippet[]> {
     `SELECT * FROM snippets
      WHERE title LIKE ? OR code LIKE ? OR description LIKE ? OR tags LIKE ?
      ORDER BY updated_at DESC`,
-    [searchTerm, searchTerm, searchTerm, searchTerm]
+    [searchTerm, searchTerm, searchTerm, searchTerm],
   );
   return rows.map(rowToSnippet);
 }
 
-export async function getSnippetsByLanguage(language: Language): Promise<Snippet[]> {
+export async function getSnippetsByLanguage(
+  language: Language,
+): Promise<Snippet[]> {
   const database = await getDatabase();
   const rows = await database.getAllAsync<SnippetRow>(
-    'SELECT * FROM snippets WHERE language = ? ORDER BY updated_at DESC',
-    [language]
+    "SELECT * FROM snippets WHERE language = ? ORDER BY updated_at DESC",
+    [language],
   );
   return rows.map(rowToSnippet);
 }
 
-export async function createSnippet(snippet: Omit<Snippet, 'id' | 'createdAt' | 'updatedAt'>): Promise<Snippet> {
+export async function createSnippet(
+  snippet: Omit<Snippet, "id" | "createdAt" | "updatedAt">,
+): Promise<Snippet> {
   const database = await getDatabase();
   const id = generateId();
   const now = new Date().toISOString();
@@ -124,7 +136,7 @@ export async function createSnippet(snippet: Omit<Snippet, 'id' | 'createdAt' | 
       snippet.filePath ?? null,
       now,
       now,
-    ]
+    ],
   );
   return {
     ...snippet,
@@ -134,50 +146,77 @@ export async function createSnippet(snippet: Omit<Snippet, 'id' | 'createdAt' | 
   };
 }
 
-export async function updateSnippet(id: string, updates: Partial<Omit<Snippet, 'id' | 'createdAt'>>): Promise<void> {
+export async function updateSnippet(
+  id: string,
+  updates: Partial<Omit<Snippet, "id" | "createdAt">>,
+): Promise<void> {
   const database = await getDatabase();
   const now = new Date().toISOString();
   const fields: string[] = [];
   const values: (string | number | null)[] = [];
 
-  if (updates.title !== undefined) { fields.push('title = ?'); values.push(updates.title); }
-  if (updates.code !== undefined) { fields.push('code = ?'); values.push(updates.code); }
-  if (updates.language !== undefined) { fields.push('language = ?'); values.push(updates.language); }
-  if (updates.tags !== undefined) { fields.push('tags = ?'); values.push(JSON.stringify(updates.tags)); }
-  if (updates.description !== undefined) { fields.push('description = ?'); values.push(updates.description); }
-  if (updates.isFavorite !== undefined) { fields.push('is_favorite = ?'); values.push(updates.isFavorite ? 1 : 0); }
-  if (updates.filePath !== undefined) { fields.push('file_path = ?'); values.push(updates.filePath); }
+  if (updates.title !== undefined) {
+    fields.push("title = ?");
+    values.push(updates.title);
+  }
+  if (updates.code !== undefined) {
+    fields.push("code = ?");
+    values.push(updates.code);
+  }
+  if (updates.language !== undefined) {
+    fields.push("language = ?");
+    values.push(updates.language);
+  }
+  if (updates.tags !== undefined) {
+    fields.push("tags = ?");
+    values.push(JSON.stringify(updates.tags));
+  }
+  if (updates.description !== undefined) {
+    fields.push("description = ?");
+    values.push(updates.description);
+  }
+  if (updates.isFavorite !== undefined) {
+    fields.push("is_favorite = ?");
+    values.push(updates.isFavorite ? 1 : 0);
+  }
+  if (updates.filePath !== undefined) {
+    fields.push("file_path = ?");
+    values.push(updates.filePath);
+  }
 
   if (fields.length === 0) return;
 
-  fields.push('updated_at = ?');
+  fields.push("updated_at = ?");
   values.push(now);
   values.push(id);
 
   await database.runAsync(
-    `UPDATE snippets SET ${fields.join(', ')} WHERE id = ?`,
-    values
+    `UPDATE snippets SET ${fields.join(", ")} WHERE id = ?`,
+    values,
   );
 }
 
 export async function deleteSnippet(id: string): Promise<void> {
   const database = await getDatabase();
-  await database.runAsync('DELETE FROM snippets WHERE id = ?', [id]);
+  await database.runAsync("DELETE FROM snippets WHERE id = ?", [id]);
 }
 
-export async function toggleFavorite(id: string, current: boolean): Promise<void> {
+export async function toggleFavorite(
+  id: string,
+  current: boolean,
+): Promise<void> {
   const database = await getDatabase();
   const now = new Date().toISOString();
   await database.runAsync(
-    'UPDATE snippets SET is_favorite = ?, updated_at = ? WHERE id = ?',
-    [current ? 0 : 1, now, id]
+    "UPDATE snippets SET is_favorite = ?, updated_at = ? WHERE id = ?",
+    [current ? 0 : 1, now, id],
   );
 }
 
 export async function getSnippetCount(): Promise<number> {
   const database = await getDatabase();
   const result = await database.getFirstAsync<{ count: number }>(
-    'SELECT COUNT(*) as count FROM snippets'
+    "SELECT COUNT(*) as count FROM snippets",
   );
   return result?.count ?? 0;
 }
